@@ -1083,7 +1083,7 @@ def create_ui(wrap_gradio_gpu_call):
                         process_flip = gr.Checkbox(label='创建翻转副本')
                         process_split = gr.Checkbox(label='将超大图像一分为二')
                         process_caption = gr.Checkbox(label='使用 BLIP 标题作为文件名')
-                        process_caption_deepbooru = gr.Checkbox(label='Use deepbooru for caption', visible=True if cmd_opts.deepdanbooru else False)
+                        process_caption_deepbooru = gr.Checkbox(label='使用deepbooru作为标题', visible=True if cmd_opts.deepdanbooru else False)
                         with gr.Row():
                         with gr.Column(scale=3):
                             gr.HTML(value="")
@@ -1377,7 +1377,7 @@ Requested path was: {f}
         with gr.Row():
             request_notifications = gr.Button(value='请求浏览器通知', elem_id="request_notifications")
             reload_script_bodies = gr.Button(value='重新加载自定义脚本主体 (无UI更新，无重启)', variant='secondary')
-            restart_gradio = gr.Button(value='重启 Gradio 和 Refresh 组件 (仅限自定义脚本, ui.py, js 和 css)', variant='primary')
+            restart_gradio = gr.Button(value='Restart Gradio and Refresh components (Custom Scripts, ui.py, js and css only)', variant='primary')
 
         request_notifications.click(
             fn=lambda: None,
