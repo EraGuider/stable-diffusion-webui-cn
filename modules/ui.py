@@ -696,7 +696,7 @@ def create_ui(wrap_gradio_gpu_call):
                         init_img_with_mask = gr.Image(label="Image for inpainting with mask",  show_label=False, elem_id="img2maskimg", source="upload", interactive=True, type="pil", tool="sketch", image_mode="RGBA")
 
                         init_img_inpaint = gr.Image(label="Image for img2img", show_label=False, source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_base")
-                        init_mask_inpaint = gr.Image(label="Mask", source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_mask")
+                        init_mask_inpaint = gr.Image(label="蒙板", source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_mask")
 
                         mask_blur = gr.Slider(label='蒙版模糊', minimum=0, maximum=64, step=1, value=4)
 
