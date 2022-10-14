@@ -446,7 +446,7 @@ def create_toprow(is_img2img):
             with gr.Row():
                 with gr.Column(scale=8):
                     with gr.Row():
-                        negative_prompt = gr.Textbox(label="否定提示", elem_id="negative_prompt", show_label=False, placeholder="Negative prompt", lines=2)
+                        negative_prompt = gr.Textbox(label="负面提示", elem_id="negative_prompt", show_label=False, placeholder="Negative prompt", lines=2)
                 with gr.Column(scale=1, elem_id="roll_col"):
                     sh = gr.Button(elem_id="sh", visible=True)                           
 
@@ -897,7 +897,7 @@ def create_ui(wrap_gradio_gpu_call):
 
             img2img_paste_fields = [
                 (img2img_prompt, "提示"),
-                (img2img_negative_prompt, "否定提示"),
+                (img2img_negative_prompt, "负面提示"),
                 (steps, "步数"),
                 (sampler_index, "采样器"),
                 (restore_faces, "面部修正"),
