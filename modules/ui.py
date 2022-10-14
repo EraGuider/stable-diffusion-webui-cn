@@ -475,14 +475,14 @@ def create_toprow(is_img2img):
                 if is_img2img:
                     interrogate = gr.Button('询问\nCLIP', elem_id="interrogate")
                     if cmd_opts.deepdanbooru:
-                        deepbooru = gr.Button('Interrogate\nDeepBooru', elem_id="deepbooru")
+                        deepbooru = gr.Button('询问\nDeepBooru', elem_id="deepbooru")
                     else:
                         deepbooru = None
                 else:
                     interrogate = None
                     deepbooru = None
                 prompt_style_apply = gr.Button('应用样式', elem_id="style_apply")
-                save_style = gr.Button('Create style', elem_id="style_create")
+                save_style = gr.Button('创建样式', elem_id="style_create")
 
     return prompt, roll, prompt_style, negative_prompt, prompt_style2, submit, interrogate, deepbooru, prompt_style_apply, save_style, paste, token_counter, token_button
 
@@ -654,15 +654,15 @@ def create_ui(wrap_gradio_gpu_call):
             txt2img_paste_fields = [
                 (txt2img_prompt, "提示"),
                 (txt2img_negative_prompt, "否定提示"),
-                (steps, "Steps"),
+                (steps, "步数"),
                 (sampler_index, "采样器"),
                 (restore_faces, "面部修复"),
                 (cfg_scale, "CFG 量表"),
                 (seed, "种子"),
                 (width, "Size-1"),
                 (height, "Size-2"),
-                (batch_size, "Batch size"),
-                (subseed, "变化种子"),
+                (batch_size, "批量大小"),
+                (subseed, "变体种子),
                 (subseed_strength, "种子强度"),
                 (seed_resize_from_w, "Seed resize from-1"),
                 (seed_resize_from_h, "Seed resize from-2"),
@@ -897,20 +897,20 @@ def create_ui(wrap_gradio_gpu_call):
 
             img2img_paste_fields = [
                 (img2img_prompt, "提示"),
-                (img2img_negative_prompt, "负面提示"),
-                (steps, "采样步数"),
+                (img2img_negative_prompt, "否定提示"),
+                (steps, "步数"),
                 (sampler_index, "采样器"),
-                (restore_faces, "面部秀谷"),
+                (restore_faces, "面部修正"),
                 (cfg_scale, "CFG 量表"),
                 (seed, "种子"),
                 (width, "Size-1"),
                 (height, "Size-2"),
-                (batch_size, "Batch size"),
-                (subseed, "Variation seed"),
-                (subseed_strength, "Variation seed strength"),
+                (batch_size, "批量大小"),
+                (subseed, "变体种子"),
+                (subseed_strength, "种子变异强度"),
                 (seed_resize_from_w, "Seed resize from-1"),
                 (seed_resize_from_h, "Seed resize from-2"),
-                (denoising_strength, "Denoising strength"),
+                (denoising_strength, "去噪强度"),
             ]
             modules.generation_parameters_copypaste.connect_paste(paste, img2img_paste_fields, img2img_prompt)
             token_button.click(fn=update_token_counter, inputs=[img2img_prompt, steps], outputs=[token_counter])
@@ -932,8 +932,8 @@ def create_ui(wrap_gradio_gpu_call):
                     with gr.TabItem('Scale to'):
                         with gr.Group():
                             with gr.Row():
-                                upscaling_resize_w = gr.Number(label="Width", value=512, precision=0)
-                                upscaling_resize_h = gr.Number(label="Height", value=512, precision=0)
+                                upscaling_resize_w = gr.Number(label="宽", value=512, precision=0)
+                                upscaling_resize_h = gr.Number(label="高", value=512, precision=0)
                             upscaling_crop = gr.Checkbox(label='Crop to fit', value=True)
 
                 with gr.Group():
@@ -1042,8 +1042,7 @@ def create_ui(wrap_gradio_gpu_call):
 
     with gr.Blocks() as train_interface:
         with gr.Row().style(equal_height=False):
-
-            gr.HTML(value="<p style='margin-bottom: 0.7em'>有关详细说明，请参阅<b><a href=\"https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Textual-Inversion\">wiki</a></b> </p>")
+            gr.HTML(value="<p style='margin-bottom: 0.7em'>有关详细说明，请参阅<b><a href=\"https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Textual-Inversion\">wiki</a></b>。</p>")
 
         with gr.Row().style(equal_height=False):
             with gr.Tabs(elem_id="train_tabs"):
@@ -1075,7 +1074,6 @@ def create_ui(wrap_gradio_gpu_call):
                 with gr.Tab(label="预处理图像"):
                     process_src = gr.Textbox(label='源目录')
                     process_dst = gr.Textbox(label='目标目录')
-
                     process_width = gr.Slider(minimum=64, maximum=2048, step=64, label="Width", value=512)
                     process_height = gr.Slider(minimum=64, maximum=2048, step=64, label="Height", value=512)
 
@@ -1084,9 +1082,11 @@ def create_ui(wrap_gradio_gpu_call):
                         process_split = gr.Checkbox(label='将超大图像一分为二')
                         process_caption = gr.Checkbox(label='使用 BLIP 标题作为文件名')
                         process_caption_deepbooru = gr.Checkbox(label='使用deepbooru作为标题', visible=True if cmd_opts.deepdanbooru else False)
-                        with gr.Row():
+                        
+                    with gr.Row():
                         with gr.Column(scale=3):
                             gr.HTML(value="")
+                            
                         with gr.Column():
                             run_preprocess = gr.Button(value="预处理", variant='primary')
 
@@ -1377,7 +1377,7 @@ Requested path was: {f}
         with gr.Row():
             request_notifications = gr.Button(value='请求浏览器通知', elem_id="request_notifications")
             reload_script_bodies = gr.Button(value='重新加载自定义脚本主体 (无UI更新，无重启)', variant='secondary')
-            restart_gradio = gr.Button(value='Restart Gradio and Refresh components (Custom Scripts, ui.py, js and css only)', variant='primary')
+            restart_gradio = gr.Button(value='重启 Gradio 和 Refresh 组件 (仅限自定义脚本, ui.py, js 和 css)', variant='primary')
 
         request_notifications.click(
             fn=lambda: None,
