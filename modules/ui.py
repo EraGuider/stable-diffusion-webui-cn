@@ -432,7 +432,7 @@ def create_toprow(is_img2img):
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
-                        prompt = gr.Textbox(label="提示词", elem_id=f"{id_part}_prompt", show_label=False, placeholder="Prompt", lines=2)
+                        prompt = gr.Textbox(label="提示词", elem_id=f"{id_part}_prompt", show_label=False, placeholder="提示词", lines=2)
 
                 with gr.Column(scale=1, elem_id="roll_col"):
                     roll = gr.Button(value=art_symbol, elem_id="roll", visible=len(shared.artist_db.artists) > 0)
@@ -446,7 +446,7 @@ def create_toprow(is_img2img):
             with gr.Row():
                 with gr.Column(scale=8):
                     with gr.Row():
-                        negative_prompt = gr.Textbox(label="负面提示", elem_id="negative_prompt", show_label=False, placeholder="Negative prompt", lines=2)
+                        negative_prompt = gr.Textbox(label="负面提示", elem_id="negative_prompt", show_label=False, placeholder="负面提示", lines=2)
                 with gr.Column(scale=1, elem_id="roll_col"):
                     sh = gr.Button(elem_id="sh", visible=True)                           
 
@@ -696,15 +696,15 @@ def create_ui(wrap_gradio_gpu_call):
                         init_img_with_mask = gr.Image(label="Image for inpainting with mask",  show_label=False, elem_id="img2maskimg", source="upload", interactive=True, type="pil", tool="sketch", image_mode="RGBA")
 
                         init_img_inpaint = gr.Image(label="Image for img2img", show_label=False, source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_base")
-                        init_mask_inpaint = gr.Image(label="Mask", source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_mask")
+                        init_mask_inpaint = gr.Image(label="蒙板", source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_mask")
 
-                        mask_blur = gr.Slider(label='遮罩模糊', minimum=0, maximum=64, step=1, value=4)
+                        mask_blur = gr.Slider(label='蒙版模糊', minimum=0, maximum=64, step=1, value=4)
 
                         with gr.Row():
-                            mask_mode = gr.Radio(label="Mask mode", show_label=False, choices=["Draw mask", "Upload mask"], type="index", value="Draw mask", elem_id="mask_mode")
-                            inpainting_mask_invert = gr.Radio(label='遮罩模式', show_label=False, choices=['Inpaint masked', 'Inpaint not masked'], value='Inpaint masked', type="index")
+                            mask_mode = gr.Radio(label="蒙版模式", show_label=False, choices=["绘制蒙版", "上传蒙板"], type="index", value="Draw mask", elem_id="mask_mode")
+                            inpainting_mask_invert = gr.Radio(label='蒙版模式', show_label=False, choices=['绘制蒙板', '绘制非蒙板'], value='Inpaint masked', type="index")
 
-                        inpainting_fill = gr.Radio(label='屏蔽的内容', choices=['fill', 'original', 'latent noise', 'latent nothing'], value='original', type="index")
+                        inpainting_fill = gr.Radio(label='屏蔽的内容', choices=['充满', '原来的', '潜在噪声', '无任何潜在'], value='original', type="index")
 
                         with gr.Row():
                             inpaint_full_res = gr.Checkbox(label='全分辨率修复', value=False)
@@ -712,12 +712,12 @@ def create_ui(wrap_gradio_gpu_call):
 
                     with gr.TabItem('批量图生图', id='batch'):
                         hidden = '<br>Disabled when launched with --hide-ui-dir-config.' if shared.cmd_opts.hide_ui_dir_config else ''
-                        gr.HTML(f"<p class=\"text-gray-500\">Process images in a directory on the same machine where the server is running.<br>Use an empty output directory to save pictures normally instead of writing to the output directory.{hidden}</p>")
+                        gr.HTML(f"<p class=\"text-gray-500\">在运行服务器的同一台机器上的目录中处理图像。<br>使用空的输出目录可以正常保存图片，而不是写入输出目录。{hidden}</p>")
                         img2img_batch_input_dir = gr.Textbox(label="输入目录", **shared.hide_dirs)
                         img2img_batch_output_dir = gr.Textbox(label="输出目录", **shared.hide_dirs)
 
                 with gr.Row():
-                    resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", show_label=False, choices=["Just resize", "Crop and resize", "Resize and fill"], type="index", value="Just resize")
+                    resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", show_label=False, choices=["只需调整大小", "裁剪和调整大小", "调整大小和填充"], type="index", value="Just resize")
 
                 steps = gr.Slider(minimum=1, maximum=150, step=1, label="采样步数", value=20)
                 sampler_index = gr.Radio(label='采样方法', choices=[x.name for x in samplers_for_img2img], value=samplers_for_img2img[0].name, type="index")
@@ -927,9 +927,9 @@ def create_ui(wrap_gradio_gpu_call):
 
 
                 with gr.Tabs(elem_id="extras_resize_mode"):
-                    with gr.TabItem('Scale by'):
-                        upscaling_resize = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="调整大小", value=2)
-                    with gr.TabItem('Scale to'):
+                    with gr.TabItem('按比例缩放'):
+                        upscaling_resize = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="调整比例", value=2)
+                    with gr.TabItem('按指定大小缩放'):
                         with gr.Group():
                             with gr.Row():
                                 upscaling_resize_w = gr.Number(label="宽", value=512, precision=0)
