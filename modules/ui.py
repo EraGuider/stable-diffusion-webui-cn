@@ -662,7 +662,7 @@ def create_ui(wrap_gradio_gpu_call):
                 (width, "Size-1"),
                 (height, "Size-2"),
                 (batch_size, "批量大小"),
-                (subseed, "变体种子),
+                (subseed, "变体种子"),
                 (subseed_strength, "种子强度"),
                 (seed_resize_from_w, "Seed resize from-1"),
                 (seed_resize_from_h, "Seed resize from-2"),
