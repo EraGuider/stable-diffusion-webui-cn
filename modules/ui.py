@@ -701,10 +701,10 @@ def create_ui(wrap_gradio_gpu_call):
                         mask_blur = gr.Slider(label='蒙版模糊', minimum=0, maximum=64, step=1, value=4)
 
                         with gr.Row():
-                            mask_mode = gr.Radio(label="蒙版模式", show_label=False, choices=["绘制蒙版", "上传蒙板"], type="index", value="Draw mask", elem_id="mask_mode")
-                            inpainting_mask_invert = gr.Radio(label='蒙版模式', show_label=False, choices=['绘制蒙板', '绘制非蒙板'], value='Inpaint masked', type="index")
+                            mask_mode = gr.Radio(label="蒙版模式", show_label=False, choices=["绘制蒙版", "上传蒙板"], type="index", value="绘制蒙版", elem_id="mask_mode")
+                            inpainting_mask_invert = gr.Radio(label='蒙版模式', show_label=False, choices=['蒙板填补', '非蒙板填补'], value='蒙板填补', type="index")
 
-                        inpainting_fill = gr.Radio(label='屏蔽的内容', choices=['充满', '原来的', '潜在噪声', '无任何潜在'], value='original', type="index")
+                        inpainting_fill = gr.Radio(label='屏蔽的内容', choices=['充满', '原始', '潜在噪点', '无任何潜在'], value='原始', type="index")
 
                         with gr.Row():
                             inpaint_full_res = gr.Checkbox(label='全分辨率修复', value=False)
@@ -717,7 +717,7 @@ def create_ui(wrap_gradio_gpu_call):
                         img2img_batch_output_dir = gr.Textbox(label="输出目录", **shared.hide_dirs)
 
                 with gr.Row():
-                    resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", show_label=False, choices=["只需调整大小", "裁剪和调整大小", "调整大小和填充"], type="index", value="Just resize")
+                    resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", show_label=False, choices=["只需调整大小", "裁剪和调整大小", "调整大小和填充"], type="index", value="只需调整大小")
 
                 steps = gr.Slider(minimum=1, maximum=150, step=1, label="采样步数", value=20)
                 sampler_index = gr.Radio(label='采样方法', choices=[x.name for x in samplers_for_img2img], value=samplers_for_img2img[0].name, type="index")
@@ -1031,7 +1031,7 @@ def create_ui(wrap_gradio_gpu_call):
                     secondary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_secondary_model_name", label="次要模型名称")
                 custom_name = gr.Textbox(label="自定义名称（可选）")
                 interp_amount = gr.Slider(minimum=0.0, maximum=1.0, step=0.05, label='差值量', value=0.3)
-                interp_method = gr.Radio(choices=["总和加权", "Sigmoid曲线", "反Sigmoid曲线"], value="Weighted Sum", label="差值方法")
+                interp_method = gr.Radio(choices=["总和加权", "Sigmoid曲线", "反Sigmoid曲线"], value="总和加权", label="差值方法")
                 save_as_half = gr.Checkbox(value=False, label="保存为float16精度")
                 modelmerger_merge = gr.Button(elem_id="modelmerger_merge", label="合并", variant='primary')
 
