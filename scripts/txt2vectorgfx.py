@@ -17,16 +17,16 @@ PO_ZIP_EXE = "potrace-1.16.win64/potrace.exe"
 PO_EXE     = "scripts/potrace.exe"
 
 StyleDict = {
-    "Anime":",(((clean ink anime illustration))),Studio Ghibli,Makoto Shinkai,Hayao Miyazaki,Audrey Kawasaki",
-    "Artistic":",(((artistic monochrome painting))),precise lineart,negative space",
-    "Cartoon":",(((clean ink funny comic cartoon illustration)))",
-    "Drawing":",(((cartoon graphic))),childrens book,lineart,negative space",
-    "Gothic":",(((gothic ink on paper))),H.P. Lovecraft,Arthur Rackham",
-    "Illustration":",(((vector graphic))),medium detail",
+    "动漫":",(((clean ink anime illustration))),Studio Ghibli,Makoto Shinkai,Hayao Miyazaki,Audrey Kawasaki",
+    "艺术":",(((artistic monochrome painting))),precise lineart,negative space",
+    "卡通":",(((clean ink funny comic cartoon illustration)))",
+    "绘画":",(((cartoon graphic))),childrens book,lineart,negative space",
+    "哥特":",(((gothic ink on paper))),H.P. Lovecraft,Arthur Rackham",
+    "插图":",(((vector graphic))),medium detail",
     "Logo":",(((centered vector graphic logo))),negative space,stencil,trending on dribbble",
-    "Sticker":",(Die-cut sticker, kawaii sticker,white background, illustration minimalism, vector, pastel colors)",
-    "Tattoo":",(((tattoo template, ink on paper))),uniform lighting,lineart,negative space",
-    "None - prompt only":""
+    "贴纸":",(Die-cut sticker, kawaii sticker,white background, illustration minimalism, vector, pastel colors)",
+    "纹身":",(((tattoo template, ink on paper))),uniform lighting,lineart,negative space",
+    "无 - 仅提示":""
 }
 
 ##########################################################################
@@ -52,12 +52,12 @@ class Script(scripts.Script):
         return "Text to Vector Graphics"
 
     def ui(self, is_img2img):
-        poUseColor = gr.Radio(list(StyleDict.keys()), label="Visual style", value="Illustration")
-        poFormat = gr.Dropdown(["svg","pdf"], label="Output format", value="svg")
-        poOpaque = gr.Checkbox(label="White is Opaque", value=True)
-        poTight = gr.Checkbox(label="Cut white margin from input", value=True)
-        poKeepPnm = gr.Checkbox(label="Keep temp images", value=False)
-        poThreshold = gr.Slider(label="Threshold", minimum=0.0, maximum=1.0, step=0.05, value=0.5)
+        poUseColor = gr.Radio(list(StyleDict.keys()), label="视觉风格", value="Illustration")
+        poFormat = gr.Dropdown(["svg","pdf"], label="输出格式", value="svg")
+        poOpaque = gr.Checkbox(label="白色不透明", value=True)
+        poTight = gr.Checkbox(label="从输入中剪切白边", value=True)
+        poKeepPnm = gr.Checkbox(label="保留临时图像", value=False)
+        poThreshold = gr.Slider(label="临界点", minimum=0.0, maximum=1.0, step=0.05, value=0.5)
 
         return [poUseColor,poFormat, poOpaque, poTight, poKeepPnm, poThreshold]
 
