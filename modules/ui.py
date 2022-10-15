@@ -433,7 +433,10 @@ def create_toprow(is_img2img):
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
-                        prompt = gr.Textbox(label="提示词", elem_id=f"{id_part}_prompt", show_label=False, placeholder="提示词", lines=2)
+                        prompt = gr.Textbox(label="提示词", elem_id=f"{id_part}_prompt", show_label=False, lines=2, 
+                            placeholder="Prompt (按Ctrl+Enter或Alt+Enter生成)"
+                        )
+
                 with gr.Column(scale=1, elem_id="roll_col"):
                     roll = gr.Button(value=art_symbol, elem_id="roll", visible=len(shared.artist_db.artists) > 0)
                     paste = gr.Button(value=paste_symbol, elem_id="paste")
@@ -446,7 +449,10 @@ def create_toprow(is_img2img):
             with gr.Row():
                 with gr.Column(scale=8):
                     with gr.Row():
-                        negative_prompt = gr.Textbox(label="负面提示", elem_id="negative_prompt", show_label=False, placeholder="负面提示", lines=2)
+                        negative_prompt = gr.Textbox(label="负面提示", elem_id=f"{id_part}_neg_prompt", show_label=False, lines=2, 
+                            placeholder="负面提示 (按Ctrl+Enter或Alt+Enter生成)"
+                        )
+
                 with gr.Column(scale=1, elem_id="roll_col"):
                     sh = gr.Button(elem_id="sh", visible=True)                           
 
@@ -745,10 +751,10 @@ def create_ui(wrap_gradio_gpu_call):
 
                 with gr.Tabs(elem_id="mode_img2img") as tabs_img2img_mode:
                     with gr.TabItem('图生图', id='img2img'):
-                        init_img = gr.Image(label="Image for img2img", elem_id="img2img_image", show_label=False, source="upload", interactive=True, type="pil", tool=cmd_opts.gradio_img2img_tool)
+                        init_img = gr.Image(label="Image for img2img", elem_id="img2img_image", show_label=False, source="upload", interactive=True, type="pil", tool=cmd_opts.gradio_img2img_tool).style(height=480)
 
                     with gr.TabItem('局部绘制', id='inpaint'):
-                        init_img_with_mask = gr.Image(label="Image for inpainting with mask",  show_label=False, elem_id="img2maskimg", source="upload", interactive=True, type="pil", tool="sketch", image_mode="RGBA")
+                        init_img_with_mask = gr.Image(label="Image for inpainting with mask",  show_label=False, elem_id="img2maskimg", source="upload", interactive=True, type="pil", tool="sketch", image_mode="RGBA").style(height=480)
 
                         init_img_inpaint = gr.Image(label="Image for img2img", show_label=False, source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_base")
                         init_mask_inpaint = gr.Image(label="蒙板", source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_mask")
@@ -1165,13 +1171,14 @@ def create_ui(wrap_gradio_gpu_call):
                         with gr.Column():
                             run_preprocess = gr.Button(value="预处理", variant='primary')
 
-                with gr.Tab(label="Train"):
+                with gr.Tab(label="训练"):
                     gr.HTML(value="<p style='margin-bottom: 0.7em'>训练嵌入；必须指定具有一组 1:1 比例图像的目录</p>")
                     train_embedding_name = gr.Dropdown(label='嵌入', choices=sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys()))
                     train_hypernetwork_name = gr.Dropdown(label='超网络', choices=[x for x in shared.hypernetworks.keys()])
                     learn_rate = gr.Textbox(label='学习率', placeholder="Learning rate", value="0.005")
-                    dataset_directory = gr.Textbox(label='数据集', placeholder="带有输入图像的目录路径")
-                    log_directory = gr.Textbox(label='数据集目录', placeholder="写入输出的目录的路径", value="textual_inversion")
+                    batch_size = gr.Number(label='批量大小', value=1, precision=0)
+                    dataset_directory = gr.Textbox(label='数据集目录', placeholder="带有输入图像的目录路径")
+                    log_directory = gr.Textbox(label='日志目录', placeholder="写入输出的目录的路径", value="textual_inversion")
                     template_file = gr.Textbox(label='提示模板文件', value=os.path.join(script_path, "textual_inversion_templates", "style_filewords.txt"))
                     training_width = gr.Slider(minimum=64, maximum=2048, step=64, label="宽", value=512)
                     training_height = gr.Slider(minimum=64, maximum=2048, step=64, label="高", value=512)
@@ -1248,6 +1255,7 @@ def create_ui(wrap_gradio_gpu_call):
             inputs=[
                 train_embedding_name,
                 learn_rate,
+                batch_size,
                 dataset_directory,
                 log_directory,
                 training_width,
@@ -1272,6 +1280,7 @@ def create_ui(wrap_gradio_gpu_call):
             inputs=[
                 train_hypernetwork_name,
                 learn_rate,
+                batch_size,
                 dataset_directory,
                 log_directory,
                 steps,
