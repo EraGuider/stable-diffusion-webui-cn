@@ -18,17 +18,17 @@ class Script(scripts.Script):
     def ui(self, is_img2img):
         seed_travel_extra = []
 
-        dest_seed = gr.Textbox(label='Destination seed(s) (Comma separated)', lines=1)
-        rnd_seed = gr.Checkbox(label='Only use Random seeds (Unless comparing paths)', value=False)
-        seed_count = gr.Number(label='Number of random seed(s)', value=4)
-        compare_paths = gr.Checkbox(label='Compare paths (Separate travels from 1st seed to each destination)', value=False)
-        steps = gr.Number(label='Steps', value=10)
-        loopback = gr.Checkbox(label='Loop back to initial seed', value=False)
-        save_video = gr.Checkbox(label='Save results as video', value=True)
-        video_fps = gr.Number(label='Frames per second', value=30)
-        show_images = gr.Checkbox(label='Show generated images in ui', value=True)
-        unsinify = gr.Checkbox(label='"Hug the middle" during interpolation', value=False)
-        allowdefsampler = gr.Checkbox(label='Allow the default Euler a Sampling method. (Does not produce good results)', value=False)
+        dest_seed = gr.Textbox(label='目标种子(s)（逗号分隔）', lines=1)
+        rnd_seed = gr.Checkbox(label='仅使用随机种子（除非比较路径）', value=False)
+        seed_count = gr.Number(label='随机种子数(s)', value=4)
+        compare_paths = gr.Checkbox(label='比较路径（从第一个种子到每个目的地的单独旅行）', value=False)
+        steps = gr.Number(label='步数', value=10)
+        loopback = gr.Checkbox(label='循环回到初始种子', value=False)
+        save_video = gr.Checkbox(label='将结果另存为视频', value=True)
+        video_fps = gr.Number(label='每秒帧数', value=30)
+        show_images = gr.Checkbox(label='在 ui 中显示生成的图像', value=True)
+        unsinify = gr.Checkbox(label='插值时靠近中间', value=False)
+        allowdefsampler = gr.Checkbox(label='允许默认的 Euler 采样方法。（不会产生好的结果）', value=False)
 
         return [rnd_seed, seed_count, dest_seed, steps, unsinify, loopback, save_video, video_fps, show_images, compare_paths, allowdefsampler]
 
