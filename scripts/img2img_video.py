@@ -96,12 +96,12 @@ class Script(scripts.Script):
     # ui elements
 
     def ui(self, is_img2img):
-        keep = gr.Checkbox(label='Keep generated pngs?', value=False)
-        res = gr.Textbox(label="Resolution: (Put in like this x:y)",
+        keep = gr.Checkbox(label='保留生成的PNG？', value=False)
+        res = gr.Textbox(label="分辨率：（像这样输入 x:y）",
                          visible=True, lines=1, value="640:480")
-        input = gr.File(label="Input Video:", type="file")
+        input = gr.File(label="输入视频:", type="file")
         prompts = gr.Textbox(
-            label="Prompt: (Seperate Positive and Negative by using ' | ') ", visible=True, lines=5, value="")
+            label="提示：（用'|'分隔正负） ", visible=True, lines=5, value="")
         return [prompts, input, res, keep]
     # here happens the good stuff
 
