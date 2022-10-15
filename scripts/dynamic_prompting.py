@@ -114,14 +114,8 @@ class Script(scripts.Script):
 
     def ui(self, is_img2img):
         html = f"""
-            <h3><strong>Combinations</strong></h3>
-            Choose a number of terms from a list, in this case we choose two artists
-            <code>{{2$$artist1|artist2|artist3}}</code>
-            If $$ is not provided, then 1$$ is assumed.
-            <br/><br/>
-
-            <h3><strong>Wildcards</strong></h3>
-            <p>Available wildcards</p>
+            <h3><strong>通配符</strong></h3>
+            <p>可用通配符</p>
             <ul>
         """
         
@@ -133,9 +127,6 @@ class Script(scripts.Script):
 
         html += "</ul>"
         html += f"""
-            <br/>
-            <code>WILDCARD_DIR: {WILDCARD_DIR}</code><br/>
-            <small>You can add more wildcards by creating a text file with one term per line and name is mywildcards.txt. Place it in {WILDCARD_DIR}. <code>__mywildcards__</code> will then become available.</small>
         """
         info = gr.HTML(html)
         return [info]
