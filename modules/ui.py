@@ -56,7 +56,7 @@ if not cmd_opts.share and not cmd_opts.listen:
 if cmd_opts.ngrok != None:
     import modules.ngrok as ngrok
     print('ngrok authtoken detected, trying to connect...')
-    ngrok.connect(cmd_opts.ngrok, cmd_opts.port if cmd_opts.port != None else 7860)
+    ngrok.connect(cmd_opts.ngrok, cmd_opts.port if cmd_opts.port != None else 7860, cmd_opts.ngrok_region)
 
 
 def gr_show(visible=True):
@@ -459,7 +459,7 @@ def create_toprow(is_img2img):
                 with gr.Column(scale=80):
                     with gr.Row():
                         prompt = gr.Textbox(label="提示词", elem_id=f"{id_part}_prompt", show_label=False, lines=2, 
-                            placeholder="Prompt (按Ctrl+Enter或Alt+Enter生成)"
+                            placeholder="提示词 (按Ctrl+Enter或Alt+Enter生成)"
                         )
 
             with gr.Row():
@@ -508,9 +508,11 @@ def create_toprow(is_img2img):
             with gr.Row():
                 with gr.Column(scale=1, elem_id="style_pos_col"):
                     prompt_style = gr.Dropdown(label="Style 1", elem_id=f"{id_part}_style_index", choices=[k for k, v in shared.prompt_styles.styles.items()], value=next(iter(shared.prompt_styles.styles.keys())))
+                    prompt_style.save_to_config = True
 
                 with gr.Column(scale=1, elem_id="style_neg_col"):
                     prompt_style2 = gr.Dropdown(label="Style 2", elem_id=f"{id_part}_style2_index", choices=[k for k, v in shared.prompt_styles.styles.items()], value=next(iter(shared.prompt_styles.styles.keys())))
+                    prompt_style2.save_to_config = True
 
     return prompt, roll, prompt_style, negative_prompt, prompt_style2, submit, button_interrogate, button_deepbooru, prompt_style_apply, save_style, paste, token_counter, token_button
 
@@ -565,6 +567,24 @@ def apply_setting(key, value):
 def create_ui(wrap_gradio_gpu_call):
     import modules.img2img
     import modules.txt2img
+
+    def create_refresh_button(refresh_component, refresh_method, refreshed_args, elem_id):
+        def refresh():
+            refresh_method()
+            args = refreshed_args() if callable(refreshed_args) else refreshed_args
+
+            for k, v in args.items():
+                setattr(refresh_component, k, v)
+
+            return gr.update(**(args or {}))
+
+        refresh_button = gr.Button(value=refresh_symbol, elem_id=elem_id)
+        refresh_button.click(
+            fn = refresh,
+            inputs = [],
+            outputs = [refresh_component]
+        )
+        return refresh_button
 
     with gr.Blocks(analytics_enabled=False) as txt2img_interface:
         txt2img_prompt, roll, txt2img_prompt_style, txt2img_negative_prompt, txt2img_prompt_style2, submit, _, _, txt2img_prompt_style_apply, txt2img_save_style, txt2img_paste, token_counter, token_button = create_toprow(is_img2img=False)
@@ -1202,17 +1222,21 @@ def create_ui(wrap_gradio_gpu_call):
                             gr.HTML(value="")
                             
                         with gr.Column():
-                            run_preprocess = gr.Button(value="预处理", variant='primary')
+                            run_preprocess = gr.Button(value="Preprocess", variant='primary')
 
                 with gr.Tab(label="训练"):
                     gr.HTML(value="<p style='margin-bottom: 0.7em'>训练嵌入；必须指定具有一组 1:1 比例图像的目录</p>")
-                    train_embedding_name = gr.Dropdown(label='嵌入', choices=sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys()))
-                    train_hypernetwork_name = gr.Dropdown(label='超网络', choices=[x for x in shared.hypernetworks.keys()])
+                    with gr.Row():
+                        train_embedding_name = gr.Dropdown(label='嵌入', choices=sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys()))
+                        create_refresh_button(train_embedding_name, sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings, lambda: {"choices": sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys())}, "refresh_train_embedding_name")
+                    with gr.Row():
+                        train_hypernetwork_name = gr.Dropdown(label='超网络', choices=[x for x in shared.hypernetworks.keys()])
+                        create_refresh_button(train_hypernetwork_name, shared.reload_hypernetworks, lambda: {"choices": sorted([x for x in shared.hypernetworks.keys()])}, "refresh_train_hypernetwork_name")
                     learn_rate = gr.Textbox(label='学习率', placeholder="Learning rate", value="0.005")
                     batch_size = gr.Number(label='批量大小', value=1, precision=0)
                     dataset_directory = gr.Textbox(label='数据集目录', placeholder="带有输入图像的目录路径")
                     log_directory = gr.Textbox(label='日志目录', placeholder="写入输出的目录的路径", value="textual_inversion")
-                    template_file = gr.Textbox(label='提示模板文件', value=os.path.join(script_path, "textual_inversion_templates", "style_filewords.txt"))
+                    template_file = gr.Textbox(label='Prompt template file', value=os.path.join(script_path, "textual_inversion_templates", "style_filewords.txt"))
                     training_width = gr.Slider(minimum=64, maximum=2048, step=64, label="宽", value=512)
                     training_height = gr.Slider(minimum=64, maximum=2048, step=64, label="高", value=512)
                     steps = gr.Number(label='最大步数', value=100000, precision=0)
@@ -1358,26 +1382,11 @@ def create_ui(wrap_gradio_gpu_call):
         if info.refresh is not None:
             if is_quicksettings:
                 res = comp(label=info.label, value=fun, **(args or {}))
-                refresh_button = gr.Button(value=refresh_symbol, elem_id="refresh_"+key)
+                refresh_button = create_refresh_button(res, info.refresh, info.component_args, "refresh_" + key)
             else:
                 with gr.Row(variant="compact"):
                     res = comp(label=info.label, value=fun, **(args or {}))
-                    refresh_button = gr.Button(value=refresh_symbol, elem_id="refresh_" + key)
-
-            def refresh():
-                info.refresh()
-                refreshed_args = info.component_args() if callable(info.component_args) else info.component_args
-
-                for k, v in refreshed_args.items():
-                    setattr(res, k, v)
-
-                return gr.update(**(refreshed_args or {}))
-
-            refresh_button.click(
-                fn=refresh,
-                inputs=[],
-                outputs=[res],
-            )
+                    refresh_button = create_refresh_button(res, info.refresh, info.component_args, "refresh_" + key)
         else:
             res = comp(label=info.label, value=fun, **(args or {}))
 
@@ -1719,7 +1728,9 @@ Requested path was: {f}
             saved_value = ui_settings.get(key, None)
             if saved_value is None:
                 ui_settings[key] = getattr(obj, field)
-            elif condition is None or condition(saved_value):
+            elif condition and not condition(saved_value):
+                print(f'Warning: Bad ui setting value: {key}: {saved_value}; Default value "{getattr(obj, field)}" will be used instead.')
+            else:
                 setattr(obj, field, saved_value)
 
         if type(x) in [gr.Slider, gr.Radio, gr.Checkbox, gr.Textbox, gr.Number] and x.visible:
@@ -1742,6 +1753,11 @@ Requested path was: {f}
 
         if type(x) == gr.Number:
             apply_field(x, 'value')
+
+        # Since there are many dropdowns that shouldn't be saved,
+        # we only mark dropdowns that should be saved.
+        if type(x) == gr.Dropdown and getattr(x, 'save_to_config', False):
+            apply_field(x, 'value', lambda val: val in x.choices)
 
     visit(txt2img_interface, loadsave, "txt2img")
     visit(img2img_interface, loadsave, "img2img")
