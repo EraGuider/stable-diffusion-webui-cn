@@ -1213,6 +1213,7 @@ def create_ui(wrap_gradio_gpu_call):
                     new_embedding_name = gr.Textbox(label="名称")
                     initialization_text = gr.Textbox(label="初始化文本", value="*")
                     nvpt = gr.Slider(label="每个标记的向量数", minimum=1, maximum=75, step=1, value=1)
+                    overwrite_old_embedding = gr.Checkbox(value=False, label="覆盖旧嵌入")
 
                     with gr.Row():
                         with gr.Column(scale=3):
@@ -1227,6 +1228,8 @@ def create_ui(wrap_gradio_gpu_call):
                     new_hypernetwork_sizes = gr.CheckboxGroup(label="模块", value=["768", "320", "640", "1280"], choices=["768", "320", "640", "1280"])
                     new_hypernetwork_layer_structure = gr.Textbox("1, 2, 1", label="输入超网络层结构", placeholder="1st and last digit must be 1. ex:'1, 2, 1'")
                     new_hypernetwork_add_layer_norm = gr.Checkbox(label="添加层规则")
+                    overwrite_old_hypernetwork = gr.Checkbox(value=False, label="覆盖旧的超网络")
+                    new_hypernetwork_activation_func = gr.Dropdown(value="relu", label="选择超网络激活功能", choices=["linear", "relu", "leakyrelu"])
 
                     with gr.Row():
                         with gr.Column(scale=3):
@@ -1240,6 +1243,7 @@ def create_ui(wrap_gradio_gpu_call):
                     process_dst = gr.Textbox(label='目标目录')
                     process_width = gr.Slider(minimum=64, maximum=2048, step=64, label="Width", value=512)
                     process_height = gr.Slider(minimum=64, maximum=2048, step=64, label="Height", value=512)
+                    preprocess_txt_action = gr.Dropdown(label='Existing Caption txt Action', value="ignore", choices=["ignore", "copy", "prepend", "append"])
 
                     with gr.Row():
                         process_flip = gr.Checkbox(label='创建翻转副本')
@@ -1255,14 +1259,17 @@ def create_ui(wrap_gradio_gpu_call):
                             run_preprocess = gr.Button(value="Preprocess", variant='primary')
 
                 with gr.Tab(label="训练"):
-                    gr.HTML(value="<p style='margin-bottom: 0.7em'>训练嵌入；必须指定具有一组 1:1 比例图像的目录</p>")
+                    gr.HTML(value="<p style='margin-bottom: 0.7em'>训练嵌入；必须指定具有一组 1:1 比例图像的目录 <a href=\"https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Textual-Inversion\" style=\"font-weight:bold;\">[wiki]</a></p>")
                     with gr.Row():
                         train_embedding_name = gr.Dropdown(label='嵌入', elem_id="train_embedding", choices=sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys()))
                         create_refresh_button(train_embedding_name, sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings, lambda: {"choices": sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys())}, "refresh_train_embedding_name")
                     with gr.Row():
                         train_hypernetwork_name = gr.Dropdown(label='超网络', elem_id="train_hypernetwork", choices=[x for x in shared.hypernetworks.keys()])
                         create_refresh_button(train_hypernetwork_name, shared.reload_hypernetworks, lambda: {"choices": sorted([x for x in shared.hypernetworks.keys()])}, "refresh_train_hypernetwork_name")
-                    learn_rate = gr.Textbox(label='学习率', placeholder="Learning rate", value="0.005")
+                    with gr.Row():
+                        embedding_learn_rate = gr.Textbox(label='学习率', placeholder="Embedding Learning rate", value="0.005")
+                        hypernetwork_learn_rate = gr.Textbox(label='超网络学习率', placeholder="Hypernetwork Learning rate", value="0.00001")
+                    
                     batch_size = gr.Number(label='批量大小', value=1, precision=0)
                     dataset_directory = gr.Textbox(label='数据集目录', placeholder="带有输入图像的目录路径")
                     log_directory = gr.Textbox(label='日志目录', placeholder="写入输出的目录的路径", value="textual_inversion")
@@ -1296,6 +1303,7 @@ def create_ui(wrap_gradio_gpu_call):
                 new_embedding_name,
                 initialization_text,
                 nvpt,
+                overwrite_old_embedding,
             ],
             outputs=[
                 train_embedding_name,
@@ -1309,8 +1317,10 @@ def create_ui(wrap_gradio_gpu_call):
             inputs=[
                 new_hypernetwork_name,
                 new_hypernetwork_sizes,
+                overwrite_old_hypernetwork,
                 new_hypernetwork_layer_structure,
                 new_hypernetwork_add_layer_norm,
+                new_hypernetwork_activation_func,
             ],
             outputs=[
                 train_hypernetwork_name,
@@ -1327,6 +1337,7 @@ def create_ui(wrap_gradio_gpu_call):
                 process_dst,
                 process_width,
                 process_height,
+                preprocess_txt_action,
                 process_flip,
                 process_split,
                 process_caption,
@@ -1343,7 +1354,7 @@ def create_ui(wrap_gradio_gpu_call):
             _js="start_training_textual_inversion",
             inputs=[
                 train_embedding_name,
-                learn_rate,
+                embedding_learn_rate,
                 batch_size,
                 dataset_directory,
                 log_directory,
@@ -1368,7 +1379,7 @@ def create_ui(wrap_gradio_gpu_call):
             _js="start_training_textual_inversion",
             inputs=[
                 train_hypernetwork_name,
-                learn_rate,
+                hypernetwork_learn_rate,
                 batch_size,
                 dataset_directory,
                 log_directory,
