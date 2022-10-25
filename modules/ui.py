@@ -398,13 +398,13 @@ def create_seed_inputs():
     with gr.Row():
         with gr.Box():
             with gr.Row(elem_id='seed_row'):
-                seed = (gr.Textbox if cmd_opts.use_textbox_seed else gr.Number)(label='Seed', value=-1)
+                seed = (gr.Textbox if cmd_opts.use_textbox_seed else gr.Number)(label='种子', value=-1)
                 seed.style(container=False)
                 random_seed = gr.Button(random_symbol, elem_id='random_seed')
                 reuse_seed = gr.Button(reuse_symbol, elem_id='reuse_seed')
 
         with gr.Box(elem_id='subseed_show_box'):
-            seed_checkbox = gr.Checkbox(label='Extra', elem_id='subseed_show', value=False)
+            seed_checkbox = gr.Checkbox(label='额外的', elem_id='subseed_show', value=False)
 
     # Components to show/hide based on the 'Extra' checkbox
     seed_extras = []
@@ -413,16 +413,16 @@ def create_seed_inputs():
         seed_extras.append(seed_extra_row_1)
         with gr.Box():
             with gr.Row(elem_id='subseed_row'):
-                subseed = gr.Number(label='Variation seed', value=-1)
+                subseed = gr.Number(label='变异种子', value=-1)
                 subseed.style(container=False)
                 random_subseed = gr.Button(random_symbol, elem_id='random_subseed')
                 reuse_subseed = gr.Button(reuse_symbol, elem_id='reuse_subseed')
-        subseed_strength = gr.Slider(label='Variation strength', value=0.0, minimum=0, maximum=1, step=0.01)
+        subseed_strength = gr.Slider(label='变化强度', value=0.0, minimum=0, maximum=1, step=0.01)
 
     with gr.Row(visible=False) as seed_extra_row_2:
         seed_extras.append(seed_extra_row_2)
-        seed_resize_from_w = gr.Slider(minimum=0, maximum=2048, step=64, label="Resize seed from width", value=0)
-        seed_resize_from_h = gr.Slider(minimum=0, maximum=2048, step=64, label="Resize seed from height", value=0)
+        seed_resize_from_w = gr.Slider(minimum=0, maximum=2048, step=64, label="从宽度调整种子大小", value=0)
+        seed_resize_from_h = gr.Slider(minimum=0, maximum=2048, step=64, label="从高度调整种子大小", value=0)
 
     random_seed.click(fn=lambda: -1, show_progress=False, inputs=[], outputs=[seed])
     random_subseed.click(fn=lambda: -1, show_progress=False, inputs=[], outputs=[subseed])
@@ -494,15 +494,15 @@ def create_toprow(is_img2img):
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
-                        prompt = gr.Textbox(label="Prompt", elem_id=f"{id_part}_prompt", show_label=False, lines=2,
-                            placeholder="Prompt (press Ctrl+Enter or Alt+Enter to generate)"
+                        prompt = gr.Textbox(label="提示词", elem_id=f"{id_part}_prompt", show_label=False, lines=2,
+                            placeholder="提示词 (按Ctrl+Enter或Alt+Enter生成)"
                         )
 
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
-                        negative_prompt = gr.Textbox(label="Negative prompt", elem_id=f"{id_part}_neg_prompt", show_label=False, lines=2,
-                            placeholder="Negative prompt (press Ctrl+Enter or Alt+Enter to generate)"
+                        negative_prompt = gr.Textbox(label="负面提示", elem_id=f"{id_part}_neg_prompt", show_label=False, lines=2,
+                            placeholder="负面提示 (按Ctrl+Enter或Alt+Enter生成)"
                         )
 
         with gr.Column(scale=1, elem_id="roll_col"):
@@ -525,9 +525,9 @@ def create_toprow(is_img2img):
 
         with gr.Column(scale=1):
             with gr.Row():
-                skip = gr.Button('Skip', elem_id=f"{id_part}_skip")
-                interrupt = gr.Button('Interrupt', elem_id=f"{id_part}_interrupt")
-                submit = gr.Button('Generate', elem_id=f"{id_part}_generate", variant='primary')
+                skip = gr.Button('跳过', elem_id=f"{id_part}_skip")
+                interrupt = gr.Button('中断', elem_id=f"{id_part}_interrupt")
+                submit = gr.Button('生成', elem_id=f"{id_part}_generate", variant='primary')
 
                 skip.click(
                     fn=lambda: shared.state.skip(),
@@ -647,28 +647,29 @@ def create_ui(wrap_gradio_gpu_call):
 
         with gr.Row().style(equal_height=False):
             with gr.Column(variant='panel'):
-                steps = gr.Slider(minimum=1, maximum=150, step=1, label="Sampling Steps", value=20)
-                sampler_index = gr.Radio(label='Sampling method', elem_id="txt2img_sampling", choices=[x.name for x in samplers], value=samplers[0].name, type="index")
+                steps = gr.Slider(minimum=1, maximum=150, step=1, label="采样步数", value=20)
+                sampler_index = gr.Radio(label='抽样方法', elem_id="txt2img_sampling", choices=[x.name for x in samplers], value=samplers[0].name, type="index")
 
                 with gr.Group():
-                    width = gr.Slider(minimum=64, maximum=2048, step=64, label="Width", value=512)
-                    height = gr.Slider(minimum=64, maximum=2048, step=64, label="Height", value=512)
+                    width = gr.Slider(minimum=64, maximum=2048, step=64, label="宽度", value=512)
+                    height = gr.Slider(minimum=64, maximum=2048, step=64, label="高度", value=512)
 
                 with gr.Row():
-                    restore_faces = gr.Checkbox(label='Restore faces', value=False, visible=len(shared.face_restorers) > 1)
-                    tiling = gr.Checkbox(label='Tiling', value=False)
-                    enable_hr = gr.Checkbox(label='Highres. fix', value=False)
+                    restore_faces = gr.Checkbox(label='面部修正', value=False, visible=len(shared.face_restorers) > 1)
+                    tiling = gr.Checkbox(label='平铺为贴图', value=False)
+                    enable_hr = gr.Checkbox(label='高清修正', value=False)
 
                 with gr.Row(visible=False) as hr_options:
-                    firstphase_width = gr.Slider(minimum=0, maximum=1024, step=64, label="Firstpass width", value=0)
-                    firstphase_height = gr.Slider(minimum=0, maximum=1024, step=64, label="Firstpass height", value=0)
-                    denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='Denoising strength', value=0.7)
+                    firstphase_width = gr.Slider(minimum=0, maximum=1024, step=64, label="第一通道宽度", value=0)
+                    firstphase_height = gr.Slider(minimum=0, maximum=1024, step=64, label="第一通道高度", value=0)
+                    denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='去噪强度', value=0.7)
 
                 with gr.Row(equal_height=True):
-                    batch_count = gr.Slider(minimum=1, step=1, label='Batch count', value=1)
-                    batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1)
+                    batch_count = gr.Slider(minimum=1, step=1, label='生成批数', value=1)
+                    batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='每批数量', value=1)
 
-                cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG Scale', value=7.0)
+
+                cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG 量表', value=7.0)
 
                 seed, reuse_seed, subseed, reuse_subseed, subseed_strength, seed_resize_from_h, seed_resize_from_w, seed_checkbox = create_seed_inputs()
 
@@ -683,15 +684,15 @@ def create_ui(wrap_gradio_gpu_call):
 
                 with gr.Column():
                     with gr.Row():
-                        save = gr.Button('Save')
-                        send_to_img2img = gr.Button('Send to img2img')
-                        send_to_inpaint = gr.Button('Send to inpaint')
-                        send_to_extras = gr.Button('Send to extras')
+                        save = gr.Button('保存图片')
+                        send_to_img2img = gr.Button('发送至图生图')
+                        send_to_inpaint = gr.Button('发送至局部绘制')
+                        send_to_extras = gr.Button('发送到高清处理')
                         button_id = "hidden_element" if shared.cmd_opts.hide_ui_dir_config else 'open_folder'
                         open_txt2img_folder = gr.Button(folder_symbol, elem_id=button_id)
 
                     with gr.Row():
-                        do_make_zip = gr.Checkbox(label="Make Zip when Save?", value=False)
+                        do_make_zip = gr.Checkbox(label="保存时制作Zip?", value=False)
 
                     with gr.Row():
                         download_files = gr.File(None, file_count="multiple", interactive=False, show_label=False, visible=False)
@@ -786,22 +787,22 @@ def create_ui(wrap_gradio_gpu_call):
 
             global txt2img_paste_fields 
             txt2img_paste_fields = [
-                (txt2img_prompt, "Prompt"),
-                (txt2img_negative_prompt, "Negative prompt"),
-                (steps, "Steps"),
-                (sampler_index, "Sampler"),
-                (restore_faces, "Face restoration"),
-                (cfg_scale, "CFG scale"),
-                (seed, "Seed"),
+                (txt2img_prompt, "提示"),
+                (txt2img_negative_prompt, "否定提示"),
+                (steps, "步数"),
+                (sampler_index, "采样器"),
+                (restore_faces, "面部修复"),
+                (cfg_scale, "CFG 量表"),
+                (seed, "种子"),
                 (width, "Size-1"),
                 (height, "Size-2"),
-                (batch_size, "Batch size"),
-                (subseed, "Variation seed"),
-                (subseed_strength, "Variation seed strength"),
+                (batch_size, "批量大小"),
+                (subseed, "变体种子"),
+                (subseed_strength, "种子强度"),
                 (seed_resize_from_w, "Seed resize from-1"),
                 (seed_resize_from_h, "Seed resize from-2"),
-                (denoising_strength, "Denoising strength"),
-                (enable_hr, lambda d: "Denoising strength" in d),
+                (denoising_strength, "去噪强度"),
+                (enable_hr, lambda d: "去噪强度" in d),
                 (hr_options, lambda d: gr.Row.update(visible="Denoising strength" in d)),
                 (firstphase_width, "First pass size-1"),
                 (firstphase_height, "First pass size-2"),
@@ -839,54 +840,54 @@ def create_ui(wrap_gradio_gpu_call):
             with gr.Column(variant='panel'):
 
                 with gr.Tabs(elem_id="mode_img2img") as tabs_img2img_mode:
-                    with gr.TabItem('img2img', id='img2img'):
+                    with gr.TabItem('图生图', id='img2img'):
                         init_img = gr.Image(label="Image for img2img", elem_id="img2img_image", show_label=False, source="upload", interactive=True, type="pil", tool=cmd_opts.gradio_img2img_tool).style(height=480)
 
-                    with gr.TabItem('Inpaint', id='inpaint'):
+                    with gr.TabItem('局部绘制', id='inpaint'):
                         init_img_with_mask = gr.Image(label="Image for inpainting with mask",  show_label=False, elem_id="img2maskimg", source="upload", interactive=True, type="pil", tool="sketch", image_mode="RGBA").style(height=480)
 
                         init_img_inpaint = gr.Image(label="Image for img2img", show_label=False, source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_base")
-                        init_mask_inpaint = gr.Image(label="Mask", source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_mask")
+                        init_mask_inpaint = gr.Image(label="蒙板", source="upload", interactive=True, type="pil", visible=False, elem_id="img_inpaint_mask")
 
-                        mask_blur = gr.Slider(label='Mask blur', minimum=0, maximum=64, step=1, value=4)
-
-                        with gr.Row():
-                            mask_mode = gr.Radio(label="Mask mode", show_label=False, choices=["Draw mask", "Upload mask"], type="index", value="Draw mask", elem_id="mask_mode")
-                            inpainting_mask_invert = gr.Radio(label='Masking mode', show_label=False, choices=['Inpaint masked', 'Inpaint not masked'], value='Inpaint masked', type="index")
-
-                        inpainting_fill = gr.Radio(label='Masked content', choices=['fill', 'original', 'latent noise', 'latent nothing'], value='original', type="index")
+                        mask_blur = gr.Slider(label='蒙版模糊', minimum=0, maximum=64, step=1, value=4)
 
                         with gr.Row():
-                            inpaint_full_res = gr.Checkbox(label='Inpaint at full resolution', value=False)
-                            inpaint_full_res_padding = gr.Slider(label='Inpaint at full resolution padding, pixels', minimum=0, maximum=256, step=4, value=32)
+                            mask_mode = gr.Radio(label="蒙版模式", show_label=False, choices=["绘制蒙版", "上传蒙板"], type="index", value="绘制蒙版", elem_id="mask_mode")
+                            inpainting_mask_invert = gr.Radio(label='蒙版模式', show_label=False, choices=['蒙板填补', '非蒙板填补'], value='蒙板填补', type="index")
 
-                    with gr.TabItem('Batch img2img', id='batch'):
+                        inpainting_fill = gr.Radio(label='屏蔽的内容', choices=['充满', '原始', '潜在噪点', '无任何潜在'], value='原始', type="index")
+
+                        with gr.Row():
+                            inpaint_full_res = gr.Checkbox(label='全分辨率修复', value=False)
+                            inpaint_full_res_padding = gr.Slider(label='以全分辨率填充像素进行修复', minimum=0, maximum=256, step=4, value=32)
+
+                    with gr.TabItem('批量图生图', id='batch'):
                         hidden = '<br>Disabled when launched with --hide-ui-dir-config.' if shared.cmd_opts.hide_ui_dir_config else ''
-                        gr.HTML(f"<p class=\"text-gray-500\">Process images in a directory on the same machine where the server is running.<br>Use an empty output directory to save pictures normally instead of writing to the output directory.{hidden}</p>")
-                        img2img_batch_input_dir = gr.Textbox(label="Input directory", **shared.hide_dirs)
-                        img2img_batch_output_dir = gr.Textbox(label="Output directory", **shared.hide_dirs)
+                        gr.HTML(f"<p class=\"text-gray-500\">在运行服务器的同一台机器上的目录中处理图像。<br>使用空的输出目录可以正常保存图片，而不是写入输出目录。{hidden}</p>")
+                        img2img_batch_input_dir = gr.Textbox(label="输入目录", **shared.hide_dirs)
+                        img2img_batch_output_dir = gr.Textbox(label="输出目录", **shared.hide_dirs)
 
                 with gr.Row():
-                    resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", show_label=False, choices=["Just resize", "Crop and resize", "Resize and fill"], type="index", value="Just resize")
+                    resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", show_label=False, choices=["只需调整大小", "裁剪和调整大小", "调整大小和填充"], type="index", value="只需调整大小")
 
-                steps = gr.Slider(minimum=1, maximum=150, step=1, label="Sampling Steps", value=20)
-                sampler_index = gr.Radio(label='Sampling method', choices=[x.name for x in samplers_for_img2img], value=samplers_for_img2img[0].name, type="index")
+                steps = gr.Slider(minimum=1, maximum=150, step=1, label="采样步数", value=20)
+                sampler_index = gr.Radio(label='采样方法', choices=[x.name for x in samplers_for_img2img], value=samplers_for_img2img[0].name, type="index")
 
                 with gr.Group():
-                    width = gr.Slider(minimum=64, maximum=2048, step=64, label="Width", value=512, elem_id="img2img_width")
-                    height = gr.Slider(minimum=64, maximum=2048, step=64, label="Height", value=512, elem_id="img2img_height")
+                    width = gr.Slider(minimum=64, maximum=2048, step=64, label="宽", value=512, elem_id="img2img_width")
+                    height = gr.Slider(minimum=64, maximum=2048, step=64, label="高", value=512, elem_id="img2img_height")
 
                 with gr.Row():
-                    restore_faces = gr.Checkbox(label='Restore faces', value=False, visible=len(shared.face_restorers) > 1)
-                    tiling = gr.Checkbox(label='Tiling', value=False)
+                    restore_faces = gr.Checkbox(label='面部修复', value=False, visible=len(shared.face_restorers) > 1)
+                    tiling = gr.Checkbox(label='平铺为贴图', value=False)
 
                 with gr.Row():
-                    batch_count = gr.Slider(minimum=1, step=1, label='Batch count', value=1)
-                    batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1)
+                    batch_count = gr.Slider(minimum=1, step=1, label='批次数量', value=1)
+                    batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='每批数量', value=1)
 
                 with gr.Group():
-                    cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG Scale', value=7.0)
-                    denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='Denoising strength', value=0.75)
+                    cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG 量表', value=7.0)
+                    denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='去噪强度', value=0.75)
 
                 seed, reuse_seed, subseed, reuse_subseed, subseed_strength, seed_resize_from_h, seed_resize_from_w, seed_checkbox = create_seed_inputs()
 
@@ -901,15 +902,16 @@ def create_ui(wrap_gradio_gpu_call):
 
                 with gr.Column():
                     with gr.Row():
-                        save = gr.Button('Save')
-                        img2img_send_to_img2img = gr.Button('Send to img2img')
-                        img2img_send_to_inpaint = gr.Button('Send to inpaint')
-                        img2img_send_to_extras = gr.Button('Send to extras')
+                        save = gr.Button('保存图片')
+                        img2img_send_to_img2img = gr.Button('发送至图生图')
+                        img2img_send_to_inpaint = gr.Button('发送至局部绘制')
+                        img2img_send_to_extras = gr.Button('发送至高清处理')
                         button_id = "hidden_element" if shared.cmd_opts.hide_ui_dir_config else 'open_folder'
                         open_img2img_folder = gr.Button(folder_symbol, elem_id=button_id)
 
+
                     with gr.Row():
-                        do_make_zip = gr.Checkbox(label="Make Zip when Save?", value=False)
+                        do_make_zip = gr.Checkbox(label="保存时制作Zip?", value=False)
 
                     with gr.Row():
                         download_files = gr.File(None, file_count="multiple", interactive=False, show_label=False, visible=False)
@@ -1057,21 +1059,21 @@ def create_ui(wrap_gradio_gpu_call):
 
             global img2img_paste_fields
             img2img_paste_fields = [
-                (img2img_prompt, "Prompt"),
-                (img2img_negative_prompt, "Negative prompt"),
-                (steps, "Steps"),
-                (sampler_index, "Sampler"),
-                (restore_faces, "Face restoration"),
-                (cfg_scale, "CFG scale"),
-                (seed, "Seed"),
+                (img2img_prompt, "提示"),
+                (img2img_negative_prompt, "负面提示"),
+                (steps, "步数"),
+                (sampler_index, "采样器"),
+                (restore_faces, "面部修正"),
+                (cfg_scale, "CFG 量表"),
+                (seed, "种子"),
                 (width, "Size-1"),
                 (height, "Size-2"),
-                (batch_size, "Batch size"),
-                (subseed, "Variation seed"),
-                (subseed_strength, "Variation seed strength"),
+                (batch_size, "批量大小"),
+                (subseed, "变体种子"),
+                (subseed_strength, "种子变异强度"),
                 (seed_resize_from_w, "Seed resize from-1"),
                 (seed_resize_from_h, "Seed resize from-2"),
-                (denoising_strength, "Denoising strength"),
+                (denoising_strength, "去噪强度"),
                 *modules.scripts.scripts_img2img.infotext_fields
             ]
             token_button.click(fn=update_token_counter, inputs=[img2img_prompt, steps], outputs=[token_counter])
@@ -1080,11 +1082,11 @@ def create_ui(wrap_gradio_gpu_call):
         with gr.Row().style(equal_height=False):
             with gr.Column(variant='panel'):
                 with gr.Tabs(elem_id="mode_extras"):
-                    with gr.TabItem('Single Image'):
-                        extras_image = gr.Image(label="Source", source="upload", interactive=True, type="pil")
+                    with gr.TabItem('单张处理'):
+                        extras_image = gr.Image(label="源", source="upload", interactive=True, type="pil")
 
-                    with gr.TabItem('Batch Process'):
-                        image_batch = gr.File(label="Batch Process", file_count="multiple", interactive=True, type="file")
+                    with gr.TabItem('批量处理'):
+                        image_batch = gr.File(label="P处理", file_count="multiple", interactive=True, type="file")
 
                     with gr.TabItem('Batch from Directory'):
                         extras_batch_input_dir = gr.Textbox(label="Input directory", **shared.hide_dirs,
@@ -1096,39 +1098,39 @@ def create_ui(wrap_gradio_gpu_call):
                         show_extras_results = gr.Checkbox(label='Show result images', value=True)
 
                 with gr.Tabs(elem_id="extras_resize_mode"):
-                    with gr.TabItem('Scale by'):
-                        upscaling_resize = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="Resize", value=2)
-                    with gr.TabItem('Scale to'):
+                    with gr.TabItem('按比例缩放'):
+                        upscaling_resize = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="调整比例", value=2)
+                    with gr.TabItem('按指定大小缩放'):
                         with gr.Group():
                             with gr.Row():
-                                upscaling_resize_w = gr.Number(label="Width", value=512, precision=0)
-                                upscaling_resize_h = gr.Number(label="Height", value=512, precision=0)
+                                upscaling_resize_w = gr.Number(label="宽", value=512, precision=0)
+                                upscaling_resize_h = gr.Number(label="高", value=512, precision=0)
                             upscaling_crop = gr.Checkbox(label='Crop to fit', value=True)
                 
                 with gr.Group():
-                    extras_upscaler_1 = gr.Radio(label='Upscaler 1', elem_id="extras_upscaler_1", choices=[x.name for x in shared.sd_upscalers], value=shared.sd_upscalers[0].name, type="index") 
+                    extras_upscaler_1 = gr.Radio(label='升频器 1', elem_id="extras_upscaler_1", choices=[x.name for x in shared.sd_upscalers], value=shared.sd_upscalers[0].name, type="index") 
 
                 with gr.Group():
-                    extras_upscaler_2 = gr.Radio(label='Upscaler 2', elem_id="extras_upscaler_2", choices=[x.name for x in shared.sd_upscalers], value=shared.sd_upscalers[0].name, type="index")
-                    extras_upscaler_2_visibility = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="Upscaler 2 visibility", value=1)
+                    extras_upscaler_2 = gr.Radio(label='升频器 2', elem_id="extras_upscaler_2", choices=[x.name for x in shared.sd_upscalers], value=shared.sd_upscalers[0].name, type="index")
+                    extras_upscaler_2_visibility = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="升频器 2 可见度", value=1)
 
                 with gr.Group():
-                    gfpgan_visibility = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="GFPGAN visibility", value=0, interactive=modules.gfpgan_model.have_gfpgan)
+                    gfpgan_visibility = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="GFPGAN 可见度", value=0, interactive=modules.gfpgan_model.have_gfpgan)
 
                 with gr.Group():
-                    codeformer_visibility = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="CodeFormer visibility", value=0, interactive=modules.codeformer_model.have_codeformer)
-                    codeformer_weight = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="CodeFormer weight (0 = maximum effect, 1 = minimum effect)", value=0, interactive=modules.codeformer_model.have_codeformer)
+                    codeformer_visibility = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="CodeFormer 可见度", value=0, interactive=modules.codeformer_model.have_codeformer)
+                    codeformer_weight = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="CodeFormer 权重 (0 = 最大效果, 1 = 最小效果)", value=0, interactive=modules.codeformer_model.have_codeformer)
 
-                submit = gr.Button('Generate', elem_id="extras_generate", variant='primary')
+                submit = gr.Button('生成', elem_id="extras_generate", variant='primary')
 
             with gr.Column(variant='panel'):
-                result_images = gr.Gallery(label="Result", show_label=False)
+                result_images = gr.Gallery(label="结果", show_label=False)
                 html_info_x = gr.HTML()
                 html_info = gr.HTML()
-                extras_send_to_img2img = gr.Button('Send to img2img')
-                extras_send_to_inpaint = gr.Button('Send to inpaint')
+                extras_send_to_img2img = gr.Button('发送到图生图')
+                extras_send_to_inpaint = gr.Button('发送到局部绘制')
                 button_id = "hidden_element" if shared.cmd_opts.hide_ui_dir_config else ''
-                open_extras_folder = gr.Button('Open output directory', elem_id=button_id)
+                open_extras_folder = gr.Button('打开输出目录', elem_id=button_id)
 
 
         submit.click(
@@ -1177,7 +1179,7 @@ def create_ui(wrap_gradio_gpu_call):
     with gr.Blocks(analytics_enabled=False) as pnginfo_interface:
         with gr.Row().style(equal_height=False):
             with gr.Column(variant='panel'):
-                image = gr.Image(elem_id="pnginfo_image", label="Source", source="upload", interactive=True, type="pil")
+                image = gr.Image(elem_id="pnginfo_image", label="源", source="upload", interactive=True, type="pil")
 
             with gr.Column(variant='panel'):
                 html = gr.HTML()
@@ -1185,8 +1187,8 @@ def create_ui(wrap_gradio_gpu_call):
                 html2 = gr.HTML()
 
                 with gr.Row():
-                    pnginfo_send_to_txt2img = gr.Button('Send to txt2img')
-                    pnginfo_send_to_img2img = gr.Button('Send to img2img')
+                    pnginfo_send_to_txt2img = gr.Button('发送到字生图')
+                    pnginfo_send_to_img2img = gr.Button('发送到图生图')
 
         image.change(
             fn=wrap_gradio_call(modules.extras.run_pnginfo),
@@ -1197,17 +1199,17 @@ def create_ui(wrap_gradio_gpu_call):
     with gr.Blocks() as modelmerger_interface:
         with gr.Row().style(equal_height=False):
             with gr.Column(variant='panel'):
-                gr.HTML(value="<p>A merger of the two checkpoints will be generated in your <b>checkpoint</b> directory.</p>")
+                gr.HTML(value="<p>两个检查点的合并后将在您的 <b>检查点</b> 目录中生成。</p>")
 
                 with gr.Row():
-                    primary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_primary_model_name", label="Primary model (A)")
-                    secondary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_secondary_model_name", label="Secondary model (B)")
-                    tertiary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_tertiary_model_name", label="Tertiary model (C)")
-                custom_name = gr.Textbox(label="Custom Name (Optional)")
-                interp_amount = gr.Slider(minimum=0.0, maximum=1.0, step=0.05, label='Multiplier (M) - set to 0 to get model A', value=0.3)
-                interp_method = gr.Radio(choices=["Weighted sum", "Add difference"], value="Weighted sum", label="Interpolation Method")
-                save_as_half = gr.Checkbox(value=False, label="Save as float16")
-                modelmerger_merge = gr.Button(elem_id="modelmerger_merge", label="Merge", variant='primary')
+                    primary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_primary_model_name", label="主要模型 (A)")
+                    secondary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_secondary_model_name", label="次要模型 (B)")
+                    tertiary_model_name = gr.Dropdown(modules.sd_models.checkpoint_tiles(), elem_id="modelmerger_tertiary_model_name", label="三级模型 (C)")
+                custom_name = gr.Textbox(label="自定义名称（可选）")
+                interp_amount = gr.Slider(minimum=0.0, maximum=1.0, step=0.05, label='差值量 (M) - 设置为0得到模型 A', value=0.3)
+                interp_method = gr.Radio(choices=["加权总和", "添加区别"], value="加权总和", label="差值方法")
+                save_as_half = gr.Checkbox(value=False, label="保存为float16精度")
+                modelmerger_merge = gr.Button(elem_id="modelmerger_merge", label="合并", variant='primary')
 
             with gr.Column(variant='panel'):
                 submit_result = gr.Textbox(elem_id="modelmerger_result", show_label=False)
@@ -1216,52 +1218,53 @@ def create_ui(wrap_gradio_gpu_call):
 
     with gr.Blocks() as train_interface:
         with gr.Row().style(equal_height=False):
-            gr.HTML(value="<p style='margin-bottom: 0.7em'>See <b><a href=\"https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Textual-Inversion\">wiki</a></b> for detailed explanation.</p>")
+            gr.HTML(value="<p style='margin-bottom: 0.7em'>有关详细说明，请参阅<b><a href=\"https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Textual-Inversion\">wiki</a></b>。</p>")
 
         with gr.Row().style(equal_height=False):
             with gr.Tabs(elem_id="train_tabs"):
 
-                with gr.Tab(label="Create embedding"):
-                    new_embedding_name = gr.Textbox(label="Name")
-                    initialization_text = gr.Textbox(label="Initialization text", value="*")
-                    nvpt = gr.Slider(label="Number of vectors per token", minimum=1, maximum=75, step=1, value=1)
-                    overwrite_old_embedding = gr.Checkbox(value=False, label="Overwrite Old Embedding")
+                with gr.Tab(label="创建一个新的嵌入"):
+                    new_embedding_name = gr.Textbox(label="名称")
+                    initialization_text = gr.Textbox(label="初始化文本", value="*")
+                    nvpt = gr.Slider(label="每个标记的向量数", minimum=1, maximum=75, step=1, value=1)
+                    overwrite_old_embedding = gr.Checkbox(value=False, label="覆盖旧嵌入")
 
                     with gr.Row():
                         with gr.Column(scale=3):
                             gr.HTML(value="")
 
                         with gr.Column():
-                            create_embedding = gr.Button(value="Create embedding", variant='primary')
+                            create_embedding = gr.Button(value="创建嵌入", variant='primary')
 
-                with gr.Tab(label="Create hypernetwork"):
-                    new_hypernetwork_name = gr.Textbox(label="Name")
-                    new_hypernetwork_sizes = gr.CheckboxGroup(label="Modules", value=["768", "320", "640", "1280"], choices=["768", "320", "640", "1280"])
-                    new_hypernetwork_layer_structure = gr.Textbox("1, 2, 1", label="Enter hypernetwork layer structure", placeholder="1st and last digit must be 1. ex:'1, 2, 1'")
-                    new_hypernetwork_activation_func = gr.Dropdown(value="relu", label="Select activation function of hypernetwork", choices=["linear", "relu", "leakyrelu", "elu", "swish"])
-                    new_hypernetwork_add_layer_norm = gr.Checkbox(label="Add layer normalization")
-                    new_hypernetwork_use_dropout = gr.Checkbox(label="Use dropout")
-                    overwrite_old_hypernetwork = gr.Checkbox(value=False, label="Overwrite Old Hypernetwork")
+
+                with gr.Tab(label="创建一个新的超网络"):
+                    new_hypernetwork_name = gr.Textbox(label="名称")
+                    new_hypernetwork_sizes = gr.CheckboxGroup(label="模块", value=["768", "320", "640", "1280"], choices=["768", "320", "640", "1280"])
+                    new_hypernetwork_layer_structure = gr.Textbox("1, 2, 1", label="输入超网络层结构", placeholder="1st and last digit must be 1. ex:'1, 2, 1'")
+                    new_hypernetwork_activation_func = gr.Dropdown(value="relu", label="选择超网络激活功能", choices=["linear", "relu", "leakyrelu", "elu", "swish"])
+                    new_hypernetwork_add_layer_norm = gr.Checkbox(label="添加层规则")
+                    new_hypernetwork_use_dropout = gr.Checkbox(label="使用 dropout")
+                    overwrite_old_hypernetwork = gr.Checkbox(value=False, label="覆盖旧的超网络")
 
                     with gr.Row():
                         with gr.Column(scale=3):
                             gr.HTML(value="")
 
                         with gr.Column():
-                            create_hypernetwork = gr.Button(value="Create hypernetwork", variant='primary')
+                            create_hypernetwork = gr.Button(value="创建超网络", variant='primary')
 
-                with gr.Tab(label="Preprocess images"):
-                    process_src = gr.Textbox(label='Source directory')
-                    process_dst = gr.Textbox(label='Destination directory')
+                with gr.Tab(label="预处理图像"):
+                    process_src = gr.Textbox(label='源目录')
+                    process_dst = gr.Textbox(label='目标目录')
                     process_width = gr.Slider(minimum=64, maximum=2048, step=64, label="Width", value=512)
                     process_height = gr.Slider(minimum=64, maximum=2048, step=64, label="Height", value=512)
                     preprocess_txt_action = gr.Dropdown(label='Existing Caption txt Action', value="ignore", choices=["ignore", "copy", "prepend", "append"])
 
                     with gr.Row():
-                        process_flip = gr.Checkbox(label='Create flipped copies')
-                        process_split = gr.Checkbox(label='Split oversized images')
-                        process_caption = gr.Checkbox(label='Use BLIP for caption')
-                        process_caption_deepbooru = gr.Checkbox(label='Use deepbooru for caption', visible=True if cmd_opts.deepdanbooru else False)
+                        process_flip = gr.Checkbox(label='创建翻转副本')
+                        process_split = gr.Checkbox(label='分割超大图像')
+                        process_caption = gr.Checkbox(label='使用 BLIP 标题作为文件名')
+                        process_caption_deepbooru = gr.Checkbox(label='使用deepbooru作为标题', visible=True if cmd_opts.deepdanbooru else False)
 
                     with gr.Row(visible=False) as process_split_extra_row:
                         process_split_threshold = gr.Slider(label='Split image threshold', value=0.5, minimum=0.0, maximum=1.0, step=0.05)
@@ -1270,7 +1273,7 @@ def create_ui(wrap_gradio_gpu_call):
                     with gr.Row():
                         with gr.Column(scale=3):
                             gr.HTML(value="")
-
+                            
                         with gr.Column():
                             run_preprocess = gr.Button(value="Preprocess", variant='primary')
 
@@ -1280,34 +1283,34 @@ def create_ui(wrap_gradio_gpu_call):
                         outputs=[process_split_extra_row],
                     )
 
-                with gr.Tab(label="Train"):
-                    gr.HTML(value="<p style='margin-bottom: 0.7em'>Train an embedding or Hypernetwork; you must specify a directory with a set of 1:1 ratio images <a href=\"https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Textual-Inversion\" style=\"font-weight:bold;\">[wiki]</a></p>")
+                with gr.Tab(label="训练"):
+                    gr.HTML(value="<p style='margin-bottom: 0.7em'>训练嵌入；必须指定具有一组 1:1 比例图像的目录 <a href=\"https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Textual-Inversion\" style=\"font-weight:bold;\">[wiki]</a></p>")
                     with gr.Row():
-                        train_embedding_name = gr.Dropdown(label='Embedding', elem_id="train_embedding", choices=sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys()))
+                        train_embedding_name = gr.Dropdown(label='嵌入', elem_id="train_embedding", choices=sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys()))
                         create_refresh_button(train_embedding_name, sd_hijack.model_hijack.embedding_db.load_textual_inversion_embeddings, lambda: {"choices": sorted(sd_hijack.model_hijack.embedding_db.word_embeddings.keys())}, "refresh_train_embedding_name")
                     with gr.Row():
-                        train_hypernetwork_name = gr.Dropdown(label='Hypernetwork', elem_id="train_hypernetwork", choices=[x for x in shared.hypernetworks.keys()])
+                        train_hypernetwork_name = gr.Dropdown(label='超网络', elem_id="train_hypernetwork", choices=[x for x in shared.hypernetworks.keys()])
                         create_refresh_button(train_hypernetwork_name, shared.reload_hypernetworks, lambda: {"choices": sorted([x for x in shared.hypernetworks.keys()])}, "refresh_train_hypernetwork_name")
                     with gr.Row():
-                        embedding_learn_rate = gr.Textbox(label='Embedding Learning rate', placeholder="Embedding Learning rate", value="0.005")
-                        hypernetwork_learn_rate = gr.Textbox(label='Hypernetwork Learning rate', placeholder="Hypernetwork Learning rate", value="0.00001")
+                        embedding_learn_rate = gr.Textbox(label='嵌入学习率', placeholder="Embedding Learning rate", value="0.005")
+                        hypernetwork_learn_rate = gr.Textbox(label='超网络学习率', placeholder="Hypernetwork Learning rate", value="0.00001")
 
-                    batch_size = gr.Number(label='Batch size', value=1, precision=0)
-                    dataset_directory = gr.Textbox(label='Dataset directory', placeholder="Path to directory with input images")
-                    log_directory = gr.Textbox(label='Log directory', placeholder="Path to directory where to write outputs", value="textual_inversion")
+                    batch_size = gr.Number(label='批量大小', value=1, precision=0)
+                    dataset_directory = gr.Textbox(label='数据集目录', placeholder="带有输入图像的目录路径")
+                    log_directory = gr.Textbox(label='日志目录', placeholder="写入输出的目录的路径", value="textual_inversion")
                     template_file = gr.Textbox(label='Prompt template file', value=os.path.join(script_path, "textual_inversion_templates", "style_filewords.txt"))
-                    training_width = gr.Slider(minimum=64, maximum=2048, step=64, label="Width", value=512)
-                    training_height = gr.Slider(minimum=64, maximum=2048, step=64, label="Height", value=512)
-                    steps = gr.Number(label='Max steps', value=100000, precision=0)
-                    create_image_every = gr.Number(label='Save an image to log directory every N steps, 0 to disable', value=500, precision=0)
-                    save_embedding_every = gr.Number(label='Save a copy of embedding to log directory every N steps, 0 to disable', value=500, precision=0)
-                    save_image_with_stored_embedding = gr.Checkbox(label='Save images with embedding in PNG chunks', value=True)
-                    preview_from_txt2img = gr.Checkbox(label='Read parameters (prompt, etc...) from txt2img tab when making previews', value=False)
+                    training_width = gr.Slider(minimum=64, maximum=2048, step=64, label="宽", value=512)
+                    training_height = gr.Slider(minimum=64, maximum=2048, step=64, label="高", value=512)
+                    steps = gr.Number(label='最大步数', value=100000, precision=0)
+                    create_image_every = gr.Number(label='每 N 步保存一个图像到日志目录，0 表示禁用', value=500, precision=0)
+                    save_embedding_every = gr.Number(label='每 N 步将嵌入的副本保存到日志目录，0 表示禁用', value=500, precision=0)
+                    save_image_with_stored_embedding = gr.Checkbox(label='保存图像与嵌入在PNG块', value=True)
+                    preview_from_txt2img = gr.Checkbox(label='预览时从txt2img选项卡 (prompt, etc...) 中读取参数', value=False)
 
                     with gr.Row():
-                        interrupt_training = gr.Button(value="Interrupt")
-                        train_hypernetwork = gr.Button(value="Train Hypernetwork", variant='primary')
-                        train_embedding = gr.Button(value="Train Embedding", variant='primary')
+                        interrupt_training = gr.Button(value="打断")
+                        train_hypernetwork = gr.Button(value="训练超网络", variant='primary')
+                        train_embedding = gr.Button(value="训练嵌入", variant='primary')
 
             with gr.Column():
                 progressbar = gr.HTML(elem_id="ti_progressbar")
@@ -1547,7 +1550,7 @@ Requested path was: {f}
         return gr.update(value=value), opts.dumpjson()
 
     with gr.Blocks(analytics_enabled=False) as settings_interface:
-        settings_submit = gr.Button(value="Apply settings", variant='primary')
+        settings_submit = gr.Button(value="应用设置", variant='primary')
         result = gr.HTML()
 
         settings_cols = 3
@@ -1590,13 +1593,14 @@ Requested path was: {f}
                     components.append(component)
                     items_displayed += 1
 
-        with gr.Row():
-            request_notifications = gr.Button(value='Request browser notifications', elem_id="request_notifications")
-            download_localization = gr.Button(value='Download localization template', elem_id="download_localization")
 
         with gr.Row():
-            reload_script_bodies = gr.Button(value='Reload custom script bodies (No ui updates, No restart)', variant='secondary')
-            restart_gradio = gr.Button(value='Restart Gradio and Refresh components (Custom Scripts, ui.py, js and css only)', variant='primary')
+            request_notifications = gr.Button(value='请求浏览器通知', elem_id="request_notifications")
+            download_localization = gr.Button(value='下载本地化模板', elem_id="download_localization")
+
+        with gr.Row():
+            reload_script_bodies = gr.Button(value='重新加载自定义脚本主体 (无UI更新，无重启)', variant='secondary')
+            restart_gradio = gr.Button(value='重启 Gradio 和 Refresh 组件 (仅限自定义脚本, ui.py, js 和 css)', variant='primary')
 
         request_notifications.click(
             fn=lambda: None,
@@ -1638,12 +1642,13 @@ Requested path was: {f}
             column.__exit__()
 
     interfaces = [
-        (txt2img_interface, "txt2img", "txt2img"),
-        (img2img_interface, "img2img", "img2img"),
-        (extras_interface, "Extras", "extras"),
-        (pnginfo_interface, "PNG Info", "pnginfo"),
-        (modelmerger_interface, "Checkpoint Merger", "modelmerger"),
-        (train_interface, "Train", "ti"),
+
+        (txt2img_interface, "字生图", "txt2img"),
+        (img2img_interface, "图生图", "img2img"),
+        (extras_interface, "高清处理", "extras"),
+        (pnginfo_interface, "PNG信息", "pnginfo"),
+        (modelmerger_interface, "检查点合并", "modelmerger"),
+        (train_interface, "训练", "ti"),
     ]
 
     interfaces += script_callbacks.ui_tabs_callback()
