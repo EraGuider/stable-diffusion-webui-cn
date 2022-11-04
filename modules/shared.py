@@ -15,7 +15,7 @@ import modules.memmon
 import modules.sd_models
 import modules.styles
 import modules.devices as devices
-from modules import sd_samplers, sd_models, localization
+from modules import sd_samplers, sd_models, localization, sd_vae
 from modules.hypernetworks import hypernetwork
 from modules.paths import models_path, script_path, sd_path
 
@@ -44,6 +44,7 @@ parser.add_argument("--precision", type=str, help="evaluate at this precision", 
 parser.add_argument("--share", action='store_true', help="use share=True for gradio and make the UI accessible through their site")
 parser.add_argument("--ngrok", type=str, help="ngrok authtoken, alternative to gradio --share", default=None)
 parser.add_argument("--ngrok-region", type=str, help="The region in which ngrok should start.", default="us")
+parser.add_argument("--enable-insecure-extension-access", action='store_true', help="enable extensions tab regardless of other options")
 parser.add_argument("--codeformer-models-path", type=str, help="Path to directory with codeformer model file(s).", default=os.path.join(models_path, 'Codeformer'))
 parser.add_argument("--gfpgan-models-path", type=str, help="Path to directory with GFPGAN model file(s).", default=os.path.join(models_path, 'GFPGAN'))
 parser.add_argument("--esrgan-models-path", type=str, help="Path to directory with ESRGAN model file(s).", default=os.path.join(models_path, 'ESRGAN'))
@@ -99,7 +100,7 @@ restricted_opts = {
     "outdir_save",
 }
 
-cmd_opts.disable_extension_access = cmd_opts.share or cmd_opts.listen
+cmd_opts.disable_extension_access = (cmd_opts.share or cmd_opts.listen) and not cmd_opts.enable_insecure_extension_access
 
 devices.device, devices.device_interrogate, devices.device_gfpgan, devices.device_swinir, devices.device_esrgan, devices.device_scunet, devices.device_codeformer = \
 (devices.cpu if any(y in cmd_opts.use_cpu for y in [x, 'all']) else devices.get_optimal_device() for x in ['sd', 'interrogate', 'gfpgan', 'swinir', 'esrgan', 'scunet', 'codeformer'])
@@ -146,6 +147,9 @@ class State:
         self.interrupted = True
 
     def nextjob(self):
+        if opts.show_progress_every_n_steps == -1: 
+            self.do_set_current_image()
+            
         self.job_no += 1
         self.sampling_step = 0
         self.current_image_sampling_step = 0
@@ -186,17 +190,21 @@ class State:
 
     """sets self.current_image from self.current_latent if enough sampling steps have been made after the last call to this"""
     def set_current_image(self):
+        if self.sampling_step - self.current_image_sampling_step >= opts.show_progress_every_n_steps and opts.show_progress_every_n_steps > 0:
+            self.do_set_current_image()
+
+    def do_set_current_image(self):
         if not parallel_processing_allowed:
             return
+        if self.current_latent is None:
+            return
+            
+        if opts.show_progress_grid:
+            self.current_image = sd_samplers.samples_to_image_grid(self.current_latent)
+        else:
+            self.current_image = sd_samplers.sample_to_image(self.current_latent)
 
-        if self.sampling_step - self.current_image_sampling_step >= opts.show_progress_every_n_steps and self.current_latent is not None:
-            if opts.show_progress_grid:
-                self.current_image = sd_samplers.samples_to_image_grid(self.current_latent)
-            else:
-                self.current_image = sd_samplers.sample_to_image(self.current_latent)
-
-            self.current_image_sampling_step = self.sampling_step
-
+        self.current_image_sampling_step = self.sampling_step
 
 state = State()
 
@@ -319,6 +327,7 @@ options_templates.update(options_section(('training', "Training"), {
 options_templates.update(options_section(('sd', "Stable Diffusion"), {
     "sd_model_checkpoint": OptionInfo(None, "Stable Diffusion checkpoint", gr.Dropdown, lambda: {"choices": modules.sd_models.checkpoint_tiles()}, refresh=sd_models.list_models),
     "sd_checkpoint_cache": OptionInfo(0, "Checkpoints to cache in RAM", gr.Slider, {"minimum": 0, "maximum": 10, "step": 1}),
+    "sd_vae": OptionInfo("auto", "SD VAE", gr.Dropdown, lambda: {"choices": list(sd_vae.vae_list)}, refresh=sd_vae.refresh_vae_list),
     "sd_hypernetwork": OptionInfo("None", "Hypernetwork", gr.Dropdown, lambda: {"choices": ["None"] + [x for x in hypernetworks.keys()]}, refresh=reload_hypernetworks),
     "sd_hypernetwork_strength": OptionInfo(1.0, "Hypernetwork strength", gr.Slider, {"minimum": 0.0, "maximum": 1.0, "step": 0.001}),
     "inpainting_mask_weight": OptionInfo(1.0, "Inpainting conditioning mask strength", gr.Slider, {"minimum": 0.0, "maximum": 1.0, "step": 0.01}),
@@ -350,7 +359,7 @@ options_templates.update(options_section(('interrogate', "Interrogate Options"),
 
 options_templates.update(options_section(('ui', "User interface"), {
     "show_progressbar": OptionInfo(True, "Show progressbar"),
-    "show_progress_every_n_steps": OptionInfo(0, "Show image creation progress every N sampling steps. Set 0 to disable.", gr.Slider, {"minimum": 0, "maximum": 32, "step": 1}),
+    "show_progress_every_n_steps": OptionInfo(0, "Show image creation progress every N sampling steps. Set to 0 to disable. Set to -1 to show after completion of batch.", gr.Slider, {"minimum": -1, "maximum": 32, "step": 1}),
     "show_progress_grid": OptionInfo(True, "Show previews of all images generated in a batch as a grid"),
     "return_grid": OptionInfo(True, "Show grid in results for web"),
     "do_not_show_images": OptionInfo(False, "Do not show any images in results for web"),
@@ -395,6 +404,15 @@ class Options:
     def __setattr__(self, key, value):
         if self.data is not None:
             if key in self.data or key in self.data_labels:
+                assert not cmd_opts.freeze_settings, "changing settings is disabled"
+
+                comp_args = opts.data_labels[key].component_args
+                if isinstance(comp_args, dict) and comp_args.get('visible', True) is False:
+                    raise RuntimeError(f"not possible to set {key} because it is restricted")
+
+                if cmd_opts.hide_ui_dir_config and key in restricted_opts:
+                    raise RuntimeError(f"not possible to set {key} because it is restricted")
+
                 self.data[key] = value
                 return
 
@@ -411,6 +429,8 @@ class Options:
         return super(Options, self).__getattribute__(item)
 
     def save(self, filename):
+        assert not cmd_opts.freeze_settings, "saving settings is disabled"
+
         with open(filename, "w", encoding="utf8") as file:
             json.dump(self.data, file, indent=4)
 
@@ -437,11 +457,12 @@ class Options:
         if bad_settings > 0:
             print(f"The program is likely to not work with bad settings.\nSettings file: {filename}\nEither fix the file, or delete it and restart.", file=sys.stderr)
 
-    def onchange(self, key, func):
+    def onchange(self, key, func, call=True):
         item = self.data_labels.get(key)
         item.onchange = func
 
-        func()
+        if call:
+            func()
 
     def dumpjson(self):
         d = {k: self.data.get(k, self.data_labels.get(k).default) for k in self.data_labels.keys()}
