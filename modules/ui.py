@@ -701,7 +701,7 @@ def create_ui(wrap_gradio_gpu_call):
                     denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='Denoising strength', value=0.7)
 
                 with gr.Row(equal_height=True):
-                    batch_count = gr.Slider(minimum=1, step=1,maximum=1800, label='Batch count', value=1800)
+                    batch_count = gr.Slider(minimum=1, step=1,maximum=2000, label='Batch count', value=2000)
                     batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1)
 
                 cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG Scale', value=11.0)
